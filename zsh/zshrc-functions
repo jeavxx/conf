@@ -1,0 +1,51 @@
+# vim: set filetype=sh :
+# .zsh-functions
+
+ward() {
+    # A function to make functions with undeclared local vars safe:
+    # usage: ward [funcname] [list of variable names] [args for func]
+    # for example, if foo was declared as foo() { GLOBALVAR='crazy'; IFS=':'; echo $@; },
+    # you might ward it with `ward foo 'GLOBALVAR IFS' arg1 arg2`
+
+    # A similar effect could be achieved by just using a subshell. The benefit of
+    # this approach is that the function being called is also shielded from external
+    # values: All variables passed to ward as local are guaranteed to be null
+
+    local func="$1"; local locals="$2"
+    local resets=''; local oldval=''; local l=''
+
+    shift 2
+
+    # this =locals syntax is zsh specific: it causes zsh to loop like bash over space
+    # separated strings. See http://zsh.sourceforge.net/FAQ/zshfaq03.html
+    for l in ${=locals};
+    do
+        eval oldval=\$$l
+        reset="${reset#' '} $l=$oldval;"
+    done
+    eval "unset $locals; $func $@; $reset"
+}
+
+loadrc() {
+    source ~/.zshrc
+}
+
+is() {
+    is_cond="
+    if [[ $@ ]];
+    then
+        echo yes
+    else
+        echo no
+    fi"
+    eval "$is_cond"
+    unset is_cond
+}
+
+bbinit() {
+    local owner="$1"
+    local repo="$2"
+    git remote add origin "git@bitbucket.org:$owner/$repo.git"
+    git push -u origin --all
+    git push -u origin --tags
+}

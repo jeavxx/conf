@@ -1,0 +1,171 @@
+set encoding=utf-8
+
+" Plugin related stuff
+execute pathogen#infect()
+call pathogen#helptags()
+filetype plugin indent on
+
+set t_Co=256
+
+" Set up syntax highlighting
+let g:solarized_termcolors=256
+syntax enable
+set background=dark
+colo solarized
+"
+let g:ctrlp_map = '<c-p>'
+let g:ctrlp_cmd = 'CtrlP'
+let g:ctrlp_working_path_mode = 'ra'
+
+" Tell clam not to use vertical splits
+let g:clam_winpos = 'bel'
+let g:airline_powerline_fonts=1
+let g:airline_theme='base16'
+
+
+" Correct tab width and use tabs instead of spaces
+set tabstop=4
+set softtabstop=4
+set shiftwidth=4
+set expandtab
+set sts=4
+
+" Visual usability tweaks (numbers, ruler, etc)
+set cursorline
+set modeline
+set modelines=1
+set foldmethod=syntax
+set cindent
+set nu
+set colorcolumn=85
+set ruler
+set hlsearch
+set incsearch
+set scrolloff=3
+set showcmd
+set ttyfast
+set laststatus=2
+set list
+set listchars=tab:>\ ,eol:¬
+set splitright
+set splitbelow
+hi ColorColumn ctermbg=lightgrey guibg=lightgrey
+
+
+" Automatically expand window currently in focus
+set winheight=30
+set winminheight=6
+set winwidth=80
+
+" Save undo history for each file
+set undofile
+
+" Store undofiles and swapfiles in a centralized location to ensure tidiness
+set dir=~/.vim/tmp/swap//
+set undodir=~/.vim/tmp/undo//
+
+
+" ================ HERE be keymaps ============================================
+"
+let mapleader=","
+let maplocalleader=","
+" Use + and - to resize current window
+map + <C-W>+
+map - <C-W>-
+" Enter and S-Enter insert a line below/above cursor and return to normal
+map <S-CR> O<Esc>
+map <CR> o<Esc>
+" jk goes back to command mode
+inoremap jk <Esc>
+cnoremap %% <C-R>=expand('%:h').'/'<cr>
+" Jump around windows with <c-{h,j,k,l}>
+nnoremap <c-j> <c-w>j
+nnoremap <c-k> <c-w>k
+nnoremap <c-h> <c-w>h
+nnoremap <c-l> <c-w>l
+" Use normal regex search by default
+nnoremap / /\v
+vnoremap / /\v
+" Use semicolon as well as colon
+nnoremap ; :
+" Add maps to open python or python3 repl
+map <leader>z :!/usr/local/bin/python -i %<cr>
+map <leader>x :!python3 -i %<cr>
+" use <leader>u/U to change the case of the work you just typed, then go
+" back into insert mode. Use control-u/U in insert mode
+nnoremap <leader>u bgUwA
+inoremap <c-u> <esc>bgUwA
+nnoremap <leader>U VgUA
+" Open and close folds with space from normal mode
+nnoremap <space> za
+" Paste the current line to the one below it
+nnoremap - :m+1<cr>
+" Prevent excessive swearing
+inoremap FUCKTHIS <esc>ggdG:wq<cr>
+" Make strings all easily
+inoremap qv ""<esc>i
+" Quickly edit .vimrc
+nnoremap <leader>v mP:e $MYVIMRC<CR>
+nnoremap <leader><leader>v :so $MYVIMRC<CR>`P
+"
+" ================ Filetype stuff =================================================
+
+" go
+autocmd FileType go iabbrev pkm package main
+autocmd FileType go inoremap fcm func main() {<cr>}<esc>ko
+autocmd FileType go nnoremap <leader>r :w<cr>:Clam go run %<cr>
+
+" html
+"   script, title, etc
+autocmd FileType html inoremap abdoc <!DOCTYPE html>
+autocmd FileType html inoremap abchar <meta charset="utf=8">
+autocmd FileType html inoremap abjs <script type="text/javascript" src=""></script><esc>F"i
+autocmd FileType html inoremap abcss <link rel="stylesheet" href="" /><esc>F"i
+autocmd FileType html inoremap abtitle <title></title><esc>F<i
+autocmd FileType html inoremap abhref <a href=""></a><esc>F"i
+"   regular tags (div, head, etc)
+autocmd FileType html inoremap abhtml <html><CR></html><esc>ko
+autocmd FileType html inoremap abhead <head><CR></head><esc>ko
+autocmd FileType html inoremap abbody <body><CR></body><esc>ko
+autocmd FileType html inoremap abdiv <div><CR></div><esc>ko
+autocmd FileType html inoremap abform <form><CR></form><esc>ko
+autocmd FileType html inoremap abspan <span><CR></span><esc>ko
+autocmd FileType html inoremap abstyle <style><CR></style><esc>ko
+autocmd FileType html inoremap abpa <p><CR></p><esc>ko
+
+" 2 space indentation for js, coffee, rb, html
+autocmd FileType html,javascript,ruby,coffee,jade set softtabstop=2
+autocmd FileType html,javascript,ruby,coffee,jade set tabstop=2
+autocmd FileType html,javascript,ruby,coffee,jade set shiftwidth=2
+
+" Indentation based folding for those languages which require it
+autocmd FileType coffee,ruby,lua set foldmethod=indent
+
+" Set leader-f to compile current coffeescript file
+autocmd FileType coffee map <leader>f :w<cr>:Clam coffee -c %<cr>
+autocmd BufNewFile,BufReadPost cakefile,Cakefile set filetype=coffee
+
+" Automatically use js syntax for json files
+autocmd BufNewFile,BufReadPost *.json set filetype=javascript
+
+" lua interpreter keymap
+autocmd FileType lua nnoremap <leader>z :w<cr>:!lua -i %<cr>
+autocmd FileType python nnoremap <leader>z :!/usr/local/bin/python -i %<cr>
+
+" Use objective c highlighting for .m files
+autocmd Bufnewfile,Bufreadpost *.m set filetype=objc
+
+" Read .md files as markdown, not modula2
+autocmd Bufnewfile,Bufreadpost *.md set filetype=markdown
+
+" ================ Spelling Substitutions =====================================
+iab functino function
+
+
+" TODO vim shortcut for switching echoes and evals
+"      annotated comments for quickly de/activating statements for debugging
+"
+" Load local vimrc, if it exists
+if filereadable(glob("~/.vimrc-local"))
+    source ~/.vimrc-local
+endif

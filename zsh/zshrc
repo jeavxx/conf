@@ -1,0 +1,23 @@
+# vim: set filetype=sh :
+# Normally vim chooses the filetype zsh, which I find has inferior highlighing
+
+ZSH=$HOME/.oh-my-zsh
+ZSH_THEME="jveld"
+DISABLE_AUTO_UPDATE="true"
+plugins=(git brew mercurial docker)
+docs=$HOME/Documents
+source $ZSH/oh-my-zsh.sh
+
+
+setopt nobeep
+export EDITOR=vim
+export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/usr/local/sbin:/sbin:~/bin
+export PATH=$PATH:$HOME/.rvm/bin:/usr/local/share/npm/bin:/usr/local/heroku/bin
+export NODE_PATH=/usr/local/share/npm/lib/node_nodules
+export WORKON_HOME=$HOME/.envs
+#source /usr/local/bin/virtualenvwrapper.sh
+
+for config_file ($HOME/.zshrc-*);
+do
+    source $config_file
+done

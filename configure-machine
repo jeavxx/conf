@@ -1,0 +1,56 @@
+#!/bin/bash
+
+install_vim_dir="true"
+if [[ -d "$HOME/.vim" ]];
+then
+    install_vim_dir="false"
+fi
+
+install_oh_my_zsh="true"
+if [[ -d "$HOME/.oh-my-zsh" ]];
+then
+    install_oh_my_zsh="false"
+fi
+
+for arg in "$@"
+do
+    case $arg in
+        --vim-dir)
+            install_vim_dir="true"
+            ;;
+
+        --oh-my-zsh)
+            install_oh_my_zsh="true"
+            ;;
+    esac
+done
+
+if [[ "$install_vim_dir" == "true" ]];
+then
+    echo "configure-machine: creating .vim directory"
+    tar -xzf vim/vimdir.tar.gz -C $HOME/.vim --strip-components=1
+fi
+
+if [[ "$install_oh_my_zsh" == "true" ]];
+then
+    echo "configure-machine: installing oh-my-zsh"
+    curl -L http://install.ohmyz.sh | sh
+fi
+
+# location to put scripts
+scripts_dir=$HOME/bin
+
+# link configurations
+while read line;
+do
+    file="" # reset this so that conf-locations lines can be effectively commented out
+    eval $line
+    if [[ -f "$file" && ! "$file" -ef "$location" ]];
+    then
+        echo "configure-machine: linking $file to $location"
+        ln -f "$file" "$location"
+    elif [[ -n "$file" ]];
+    then
+        echo "configure-machine: $file already linked to $location"
+    fi
+done <conf-locations
