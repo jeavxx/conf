@@ -28,6 +28,7 @@ done
 if [[ "$install_vim_dir" == "true" ]];
 then
     echo "configure-machine: creating .vim directory"
+    mkdir "$HOME/.vim"
     tar -xzf vim/vimdir.tar.gz -C $HOME/.vim --strip-components=1
 fi
 
