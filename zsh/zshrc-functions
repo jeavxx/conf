@@ -49,3 +49,8 @@ bbinit() {
     git push -u origin --all
     git push -u origin --tags
 }
+
+vman() {
+    # Open a man page in vim
+    man $1 | col -b | vim -c 'set ft=man nomod nolist' -
+}
