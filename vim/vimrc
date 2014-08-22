@@ -44,6 +44,7 @@ set incsearch
 set scrolloff=3
 set showcmd
 set ttyfast
+set lazyredraw
 set laststatus=2
 set list
 set listchars=tab:>\ ,eol:¬
@@ -83,6 +84,8 @@ nnoremap <c-j> <c-w>j
 nnoremap <c-k> <c-w>k
 nnoremap <c-h> <c-w>h
 nnoremap <c-l> <c-w>l
+" Quickly turn off search highlighing
+nnoremap <leader><space> :nohlsearch<cr>
 " Use normal regex search by default
 nnoremap / /\v
 vnoremap / /\v
