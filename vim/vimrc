@@ -110,6 +110,8 @@ inoremap qv ""<esc>i
 " Quickly edit .vimrc
 nnoremap <leader>v mP:e $MYVIMRC<CR>
 nnoremap <leader><leader>v :so $MYVIMRC<CR>`P
+" Save as sudo without editing as sudo
+nnoremap <leader>w :w !sudo tee %<cr>
 "
 " ================ Filetype stuff =================================================
 
