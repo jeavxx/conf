@@ -8,11 +8,8 @@ then
 fi
 
 alias emacs="vim"
-alias gb="go build"
 alias gc="git commit"
 alias gcl="git clone"
-alias gg="go get"
-alias gr="go run"
 alias gs="git status"
 alias pgstart="pg_ctl -D /usr/local/var/postgres start -l logfile"
 alias pgstop="pg_ctl -D /usr/local/var/postgres stop"

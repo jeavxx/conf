@@ -163,6 +163,9 @@ autocmd Bufnewfile,Bufreadpost *.m set filetype=objc
 " Read .md files as markdown, not modula2
 autocmd Bufnewfile,Bufreadpost *.md set filetype=markdown
 
+" Turn of colorcolumn for man page
+autocmd FileType man set cc=0
+
 " ================ Spelling Substitutions =====================================
 iab functino function
 
