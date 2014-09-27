@@ -50,6 +50,7 @@ set list
 set listchars=tab:>\ ,eol:¬
 set splitright
 set splitbelow
+set backspace=indent,eol,start
 hi ColorColumn ctermbg=lightgrey guibg=lightgrey
 
 
