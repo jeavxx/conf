@@ -54,3 +54,8 @@ vman() {
     # Open a man page in vim
     man $@ | col -b | vim -c 'set ft=man nomod nolist cc=0' -
 }
+
+pman() {
+    # Open a man page in Preview
+    man -t "$1" | open -fa Preview
+}
