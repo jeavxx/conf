@@ -5,6 +5,7 @@ then
     alias bs="brew search"
     alias bu="brew update"
     alias chrome="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
+    alias -g seid="sed -i ''"
 fi
 
 alias emacs="vim"
