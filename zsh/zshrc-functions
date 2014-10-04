@@ -56,6 +56,20 @@ vman() {
 }
 
 pman() {
-    # Open a man page in Preview
-    man -t "$1" | open -fa Preview
+    local man_pdf_dir="$HOME/documents/ref/man_pdf"
+    local convert_cmd="ps2pdf - $man_pdf_dir/$1.pdf"
+    local open_cmd="open $man_pdf_dir/$1.pdf"
+
+    if [[ "$(uname -s)" == "Linux" ]];
+    then
+        open_cmd="(evince $man_pdf_dir/$1.pdf &)"
+    fi
+
+    if [[ -f "$man_pdf_dir/$1" ]];
+    then
+        eval "$open_cmd"
+        return
+    fi
+
+    eval "man -t $1 | $convert_cmd && $open_cmd"
 }
