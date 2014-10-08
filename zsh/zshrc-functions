@@ -62,8 +62,9 @@ pman() {
 
     if [[ "$(uname -s)" == "Linux" ]];
     then
-        open_cmd="(evince $man_pdf_dir/$1.pdf &)"
-    fi
+        which evince && open_cmd="evince $man_pdf_dir/$1.pdf"
+        which zathura && open_cmd="zathura --fork $man_pdf_dir/$1.pdf"
+    fi >/dev/null
 
     if [[ -f "$man_pdf_dir/$1" ]];
     then
@@ -71,5 +72,5 @@ pman() {
         return
     fi
 
-    eval "man -t $1 | $convert_cmd && $open_cmd"
+    eval "man -t $1 | $convert_cmd && $open_cmd 2>/dev/null"
 }
