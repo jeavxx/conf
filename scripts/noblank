@@ -1,2 +1,2 @@
-#!/usr/bin/env sed -Ef
+#!/usr/bin/sed -rf
 /^[[:space:]]*$/d
