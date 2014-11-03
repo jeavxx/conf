@@ -68,7 +68,7 @@ pman() {
 
     if [[ -f "$man_pdf_dir/$1" ]];
     then
-        eval "$open_cmd"
+        eval "$open_cmd 2>/dev/null"
         return
     fi
 

@@ -8,18 +8,25 @@ then
     alias -g seid="sed -i ''"
 fi
 
-alias emacs="vim"
 alias gc="git commit"
 alias gcl="git clone"
 alias gs="git status"
-alias pgstart="pg_ctl -D /usr/local/var/postgres start -l logfile"
-alias pgstop="pg_ctl -D /usr/local/var/postgres stop"
-alias prolog="swipl"
-alias pylab="ipython --pylab"
-alias serve="python -m SimpleHTTPServer &"
+
+alias 40love="python -m SimpleHTTPServer &"
 alias swag='eval sudo $(fc -l -1 | sed -E "s/[0-9]+[ ]*(.)/\1/")'
 alias tmux="tmux -2"
+
 alias v="vim"
-alias vact="source venv/bin/activate"
 alias vrc="vim ~/.vimrc"
+alias emacs="vim"
 alias zrc="vim ~/.zshrc"
+
+# Linux specific
+alias hc="herbstclient"
+alias startx="ssh-agent startx"
+alias turf="tabbed -c surf -e"
+alias trux="tabbed -c urxvtc -embed"
+
+# spelling probz
+alias -g lsit="list"
+alias bim="vim"
