@@ -1,9 +1,0 @@
-file=vim/vimrc location=$HOME/.vimrc
-file=zsh/zshrc location=$HOME/.zshrc
-file=zsh/zshrc-aliases location=$HOME/.zshrc-aliases
-file=zsh/zshrc-functions location=$HOME/.zshrc-functions
-file=zsh/jveld.zsh-theme location=$HOME/.oh-my-zsh/themes/jveld.zsh-theme
-file=zsh/jveld-minimal.zsh-theme location=$HOME/.oh-my-zsh/themes/jveld-minimal.zsh-theme
-file=scripts/noblank location=$HOME/bin/noblank
-file=Xresources location=$HOME/.Xresources
-file=tmux.conf location=$HOME/.tmux.conf
