@@ -2,20 +2,19 @@
 # Normally vim chooses the filetype zsh, which I find has inferior highlighing
 
 ZSH=$HOME/.oh-my-zsh
-ZSH_THEME="jveld2"
 DISABLE_AUTO_UPDATE="true"
-plugins=(git brew mercurial docker)
-docs=$HOME/Documents
+plugins=(git mercurial)
+
+if [[ "$TERM" == "linux" ]]; then
+    # we're in the console
+    ZSH_THEME="jveld-minimal"
+else
+    ZSH_THEME="jveld"
+fi
+
 source $ZSH/oh-my-zsh.sh
-
-
-setopt nobeep
 export EDITOR=vim
-export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/usr/local/sbin:/sbin:~/bin
-export PATH=$PATH:$HOME/.rvm/bin:/usr/local/share/npm/bin:/usr/local/heroku/bin
-export NODE_PATH=/usr/local/share/npm/lib/node_nodules
-export WORKON_HOME=$HOME/.envs
-#source /usr/local/bin/virtualenvwrapper.sh
+export PATH=/usr/bin:/usr/local/bin:~/bin
 
 for config_file ($HOME/.zshrc-*);
 do
