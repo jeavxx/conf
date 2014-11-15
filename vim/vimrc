@@ -34,7 +34,7 @@ let g:airline_theme='zenburn'
 " }}} (PLUGINS)
 
 
-" DEFAULTS {{{
+" OPTIONS {{{
 "
 set expandtab                           " expand tabs to spaces
 set tabstop=4                           " number of spaces to display for each tab character
@@ -76,11 +76,72 @@ hi CursorLine ctermbg=Black cterm=bold
 " }}}
 
 
+" FUNCTIONS {{{
+
+" s:setInterpreter: Choose an interpreter command {{{
+"   for the file to be called from the <leader>z " and <leader>Z keymaps
+function! s:setInterpreter()
+
+    let oldic=&ignorecase
+    set ignorecase
+
+    " filetype -> [ repl_command, exec_command ]
+    let repls = {
+        \ "python":   [ "!python -i %", "!python %" ],
+        \ "bash":     [ "!bash --rcfile %", "!bash %" ],
+        \ "sh":       [ "!bash --rcfile %", "!bash %" ],
+        \ "haskell":  [ "!ghci %", "!runghc %" ],
+        \ }
+
+    if has_key(repls, &filetype)
+        let b:repl = repls[&filetype][0]
+        let b:exec = repls[&filetype][1]
+    else
+        let b:repl = "echo \"unknown interpretor for filetype (\" . &filetype . \")\""
+        let b:exec = "echo \"unknown interpretor for filetype (\" . &filetype . \")\""
+    endif
+
+    let &ignorecase=oldic
+endfunction " }}}
+
+" s:setWinSize: sets the winheight, winminheight, and winwidth {{{
+"   to values that make sense with the terminal size
+function! s:adjustWinSize()
+    " usable_height = (total lines) - (wincount statuslines) -  (command line)
+    let usable_height = &lines - winnr('$') - 2
+    set winwidth=20
+
+    if winnr('$') == 1 || usable_height <= 30
+        set winheight=1
+        set winminheight=1
+        return
+    else
+        set winheight=30
+    endif
+
+    " Try as I may, the relationship between the maximum value of winminheight
+    " that vim will take without complaining, and the actual amount of lines
+    " remaining, remains completely unclear. So we'll adjust down until we get
+    " a yes
+    let c = 10
+    while c > 1
+        try
+            let &winminheight=c
+            break
+        catch /E36:/
+            let c -= 1
+        endtry
+    endwhile
+endfunction " }}}
+
+" }}} (FUNCTIONS)
+
+
 " KEYMAPS {{{
 
-" Currently taken leader keys: <space>MTUVWmptuvwxz
+" Currently taken leader keys: <space>FMTVWZcflmptuvwxz
 let mapleader=","
-let maplocalleader=","
+let maplocalleader=""
 
 " FASTER NAVIGATION! {{{
 " navigate windows with <c-{h,j,k,l}>
@@ -106,6 +167,16 @@ nnoremap / /\v
 vnoremap / /\v
 " }}}
 
+" FASTER FOLDING! {{{
+" these maps are for use only if foldmethod=marker
+" open/close a fold on the next line
+nnoremap <leader>f :execute "normal! o" . b:comment_prefix . "{{{"<esc>
+nnoremap <leader>c :execute "normal! o" . b:comment_prefix . "}}}"<esc>
+" open/close a fold at the end of the current line
+nnoremap <leader>F :execute "normal! A " . b:comment_prefix . "{{{"<esc>
+nnoremap <leader>C :execute "normal! A " . b:comment_prefix . "}}}"<esc>
+" }}}
+
 " FASTER MODE SELECTION! {{{
 " normal mode with jk
 inoremap jk <Esc>
@@ -115,12 +186,10 @@ nnoremap ; :
 
 " COMMON EDITS, WITH SPEED! {{{
 " Enter and S-Enter insert a line below/above cursor
-map <S-CR> O<Esc>
 map <CR> o<Esc>
 " Swap the case of a word or line
 nnoremap <leader>u bgUwA
 inoremap <c-u> <esc>bgUwA
-nnoremap <leader>U VgUA
 " Make strings easily
 inoremap qv ""<esc>i
 " Paste the current line to the one below it
@@ -135,6 +204,8 @@ nnoremap <leader>t :set expandtab tabstop=4 shiftwidth=4 softtabstop=4<cr>
 nnoremap <leader>T :set expandtab tabstop=8 shiftwidth=8 softtabstop=4<cr>
 nnoremap <leader>m :set expandtab tabstop=2 shiftwidth=2 softtabstop=2<cr>
 nnoremap <leader>M :set noexpandtab tabstop=4 softtabstop=4 shiftwidth=4<cr>
+" turn of listchars
+nnoremap <leader>l :set list!<cr>
 " toggle wrapping (and display current wrapping status)
 nnoremap <leader>W :setlocal wrap!<cr>:setlocal wrap?<cr>
 " }}}
@@ -143,8 +214,10 @@ nnoremap <leader>W :setlocal wrap!<cr>:setlocal wrap?<cr>
 " Use %% to refer to directory of current file on command line
 cnoremap %% <C-R>=expand('%:h').'/'<cr>
 " open python repl
-map <leader>z :!python2 -i %<cr>
-map <leader>x :!python -i %<cr>
+map <leader>x :!python<cr>
+" open interpreter for file
+map <leader>z :execute b:repl<cr>
+map <leader>Z :execute b:exec<cr>
 " edit .vimrc
 nnoremap <leader>v mP:e $MYVIMRC<CR>
 nnoremap <leader>V :so $MYVIMRC<CR>`P
@@ -171,9 +244,7 @@ augroup END "}}}
 " small terminal
 augroup wsize "{{{
     au!
-    au BufWinEnter * set winheight=30        " default height of selected window
-    au BufWinEnter * set winminheight=6      " min height of unselected windows
-    au BufWinEnter * set winwidth=80         " default width of selected window
+    au BufWinEnter * call s:adjustWinSize()
 augroup END "}}}
 
 augroup golang "{{{
@@ -207,12 +278,23 @@ augroup twospace "{{{
     au FileType html,javascript,ruby,coffee,jade set shiftwidth=2
 augroup END "}}}
 
+augroup commentstyle "{{{
+    au!
+    au FileType python,ruby,sh,zsh,bash,coffee      let b:comment_prefix="# "
+    au FileType c,cpp,java,javascript               let b:comment_prefix="// "
+    au FileType haskell,lua                         let b:comment_prefix="-- "
+    au FileType sql                                 let b:comment_prefix="; "
+    au FileTYpe vim                                 let b:comment_prefix="\" "
+augroup END "}}}
+
 augroup misc "{{{
     au!
+    " call setInterpreter once FileType is known
+    au FileType * call s:setInterpreter()
     " indentation based folding for several langs
-    autocmd FileType coffee,ruby,lua set foldmethod=indent
+    au FileType coffee,ruby,lua set foldmethod=indent
     " deactivate colorcolumn for man page
-    autocmd FileType man set cc=0
+    au FileType man set cc=0
 augroup END "}}}
 " }}}
 
