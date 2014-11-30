@@ -1,19 +1,79 @@
 " vim:foldmethod=marker
 set encoding=utf-8
 
+" OPTIONS {{{
+"
+set expandtab                           " expand tabs to spaces
+set tabstop=4                           " number of spaces to display for each tab character
+set softtabstop=4                       " number of spaces a typing a tab counts for in editing
+set shiftwidth=4                        " number of spaces to use per step of indent
+
+set foldmethod=syntax                   " define folds using language syntax
+set autoindent                          " duplicate indentation from previous line
+set backspace=indent,eol,start          " allow backspace in all contexts
+set formatprg="PARINIT='rTbgqR B=.,?_A_a Q=_s>|' par\ -w72" " Prettier line formatting
+
+set nu                                  " show line numbers
+set cursorline                          " highight line of current cursor
+set colorcolumn=80                      " highlight column/s
+set list                                " display whitespace characters
+set listchars=tab:>\ ,eol:¬             " symbols with which to display whitespace
+set scrolloff=3                         " always display three lines above/below cursor
+set ruler                               " display line,col of cursor on statusbar
+set showcmd                             " show command in progress on last line
+set laststatus=2                        " display a statusbar on all windows
+set modeline                            " detect modelines
+set modelines=1                         " how many lines to check for modelines
+set ttyfast                             " use a 'fast' terminal connection
+set lazyredraw                          " don't redraw window during macro execution
+set splitright                          " open new vertical splits on the right
+set splitbelow                          " open new horizontal splits on the bottom
+set autoread                            " automatically read changed files
+
+set magic                               " enable regex searching
+set smartcase                           " ignore case unless search has caps
+set hlsearch                            " highlight search matches
+set incsearch                           " highlight matches as they're typed
+
+set wildmenu                            " Activate the wildmenu for filenames
+set wildmode=list:longest,full          " Tab-complete files up to longest unambiguous prefix
+set mouse=a                             " Turn the mouse on
+
+set undofile                            " save undo history for each file
+set undodir=~/.vim/tmp/undo//           " store undofiles in unobtrusive location
+set dir=~/.vim/tmp/swap//               " store swapfiles in unobtrusive location
+set viminfo^=%
+set completeopt+=longest                " only match to longest common text
+
+set t_Co=256
+set bg=light
+colo bclear
+
+
+" Deactivate annoying search mappings in less mode
+if exists("loaded_less")
+    set bg=light
+    set nolist
+    colo dejavu
+    unmap /
+    unmap n
+    unmap N
+endif
+
+" }}}
+
+
 " PLUGINS {{{
 "
 execute pathogen#infect()
 call pathogen#helptags()
 
+runtime! ftplugin/man.vim
+
 filetype plugin indent on
 syntax enable
 
 " Solarized {{{
-set t_Co=256
-set background=dark
-let g:solarized_termcolors=256
-colo solarized
 " }}}
 
 " Ctrlp {{{
@@ -34,48 +94,6 @@ let g:airline_theme='zenburn'
 " }}} (PLUGINS)
 
 
-" OPTIONS {{{
-"
-set expandtab                           " expand tabs to spaces
-set tabstop=4                           " number of spaces to display for each tab character
-set softtabstop=4                       " number of spaces a typing a tab counts for in editing
-set shiftwidth=4                        " number of spaces to use per step of indent
-
-set foldmethod=syntax                   " define folds using language syntax
-set cindent                             " use c-syle indenting (see help)
-set backspace=indent,eol,start          " allow backspace in all contexts
-
-set nu                                  " show line numbers
-set cursorline                          " highight line of current cursor
-set colorcolumn=85                      " highlight column/s
-set list                                " display whitespace characters
-set listchars=tab:>\ ,eol:¬             " symbols with which to display whitespace
-set scrolloff=3                         " always display three lines above/below cursor
-
-set ruler                               " display line,col of cursor on statusbar
-set showcmd                             " show command in progress on last line
-set laststatus=2                        " display a statusbar on all windows
-
-set hlsearch                            " highlight search matches
-set incsearch                           " highlight matches as they're typed
-
-set modeline                            " detect modelines
-set modelines=1                         " how many lines to check for modelines
-set ttyfast                             " use a 'fast' terminal connection
-set lazyredraw                          " don't redraw window during macro execution
-set splitright                          " open new vertical splits on the right
-set splitbelow                          " open new horizontal splits on the bottom
-
-set undofile                            " save undo history for each file
-set undodir=~/.vim/tmp/undo//           " store undofiles in unobtrusive location
-set dir=~/.vim/tmp/swap//               " store swapfiles in unobtrusive location
-
-" Colors for cursorline & colorcolumn (ugly by default in almost all colorschemes)
-hi ColorColumn ctermbg=Black guibg=lightgrey
-hi CursorLine ctermbg=Black cterm=bold
-" }}}
-
-
 " FUNCTIONS {{{
 
 " s:setInterpreter: Choose an interpreter command {{{
@@ -91,6 +109,7 @@ function! s:setInterpreter()
         \ "bash":     [ "!bash --rcfile %", "!bash %" ],
         \ "sh":       [ "!bash --rcfile %", "!bash %" ],
         \ "haskell":  [ "!ghci %", "!runghc %" ],
+        \ "lhaskell": [ "!ghci %", "!runghc %" ],
         \ }
 
     if has_key(repls, &filetype)
@@ -134,14 +153,79 @@ function! s:adjustWinSize()
     endwhile
 endfunction " }}}
 
+" D-leet that annoying trailing writespace " {{{
+func! DeleteTrailingWS()
+  exe "normal mz"
+  %s/\s\+$//ge
+  exe "normal `z"
+endfunc " }}}
+
+" Helper for VisualSelection {{{
+function! CmdLine(str)
+  exe "menu Foo.Bar :" . a:str
+  emenu Foo.Bar
+  unmenu Foo
+endfunction " }}}
+
+" Search forward or backward for visual selection {{{
+function! VisualSelection(direction, extra_filter) range
+  let l:saved_reg = @"
+  execute "normal! vgvy"
+
+  let l:pattern = escape(@", '\\/.*$^~[]')
+  let l:pattern = substitute(l:pattern, "\n$", "", "")
+
+  if a:direction == 'b'
+    execute "normal ?" . l:pattern . "^M"
+  elseif a:direction == 'gv'
+    call CmdLine("vimgrep " . '/'. l:pattern . '/' . ' **/*.' . a:extra_filter)
+  elseif a:direction == 'replace'
+    call CmdLine("%s" . '/'. l:pattern . '/')
+  elseif a:direction == 'f'
+    execute "normal /" . l:pattern . "^M"
+  endif
+
+  let @/ = l:pattern
+  let @" = l:saved_reg
+endfunction " }}}
+
+" Fill quickfix list with committed files {{{
+function! CommittedFiles()
+  " Clear quickfix list
+  let qf_list = []
+  " Find files committed in HEAD
+  let git_output = system("git diff-tree --no-commit-id --name-only -r HEAD\n")
+  for committed_file in split(git_output, "\n")
+    let qf_item = {'filename': committed_file}
+    call add(qf_list, qf_item)
+  endfor
+  " Fill quickfix list with them
+  call setqflist(qf_list, '')
+endfunction " }}}
+
+" Hide messy Ggrep output and copen automatically {{{
+function! NonintrusiveGitGrep(term)
+  execute "copen"
+  " Map 't' to open selected item in new tab
+  execute "nnoremap <silent> <buffer> t <C-W><CR><C-W>T"
+  execute "silent! Ggrep " . a:term
+  execute "redraw!"
+endfunction " }}}
+
 " }}} (FUNCTIONS)
 
 
 " KEYMAPS {{{
 
-" Currently taken leader keys: <space>FMTVWZcflmptuvwxz
+" Currently taken leader keys: <space>VWZablpuvwxz
+"   Prefix c: bfnlp
+"   Prefix f: cCoO
+"   Prefix g: sdb?g
+"   Prefix m: ao
+"   Prefix r: rsv
+"   Prefix t: tTmM
 let mapleader=","
-let maplocalleader=""
+let maplocalleader="\\"
 
 " FASTER NAVIGATION! {{{
 " navigate windows with <c-{h,j,k,l}>
@@ -155,6 +239,11 @@ nnoremap k gk
 " Use + and - to resize current window
 map + <C-W>+
 map - <C-W>-
+" Turns out the original use of semicolon is pretty damn useful (it repeats the last
+" f, F, t, or T command, which I use a lot)
+nnoremap g. ;
+" The default use of , is similarly useful (repeats in opposite direction)
+nnoremap gm ,
 " }}}
 
 " FASTER SEARCHING! {{{
@@ -162,19 +251,21 @@ map - <C-W>-
 nnoremap <leader>p :CtrlPBuffer<cr>
 " deactivate search highlighing
 nnoremap <leader><space> :nohlsearch<cr>
-" Use normal regex search by default
-nnoremap / /\v
-vnoremap / /\v
+" search with da-cscope
+nnoremap <silent> <C-\> :cs find c <C-R>=expand("<cword>")<CR><CR>
+" quick searches from visual mode
+vnoremap <silent> * :call VisualSelection('f', '')<CR>
+vnoremap <silent> # :call VisualSelection('b', '')<CR>
 " }}}
 
 " FASTER FOLDING! {{{
 " these maps are for use only if foldmethod=marker
 " open/close a fold on the next line
-nnoremap <leader>f :execute "normal! o" . b:comment_prefix . "{{{"<esc>
-nnoremap <leader>c :execute "normal! o" . b:comment_prefix . "}}}"<esc>
+nnoremap <leader>fo :execute "normal! o" . b:comment_prefix . "{{{"<esc>
+nnoremap <leader>fc :execute "normal! o" . b:comment_prefix . "}}}"<esc>
 " open/close a fold at the end of the current line
-nnoremap <leader>F :execute "normal! A " . b:comment_prefix . "{{{"<esc>
-nnoremap <leader>C :execute "normal! A " . b:comment_prefix . "}}}"<esc>
+nnoremap <leader>fO :execute "normal! A " . b:comment_prefix . "{{{"<esc>
+nnoremap <leader>fC :execute "normal! A " . b:comment_prefix . "}}}"<esc>
 " }}}
 
 " FASTER MODE SELECTION! {{{
@@ -182,6 +273,8 @@ nnoremap <leader>C :execute "normal! A " . b:comment_prefix . "}}}"<esc>
 inoremap jk <Esc>
 " semicolon to enter command line
 nnoremap ; :
+" get to ex mode (I have Q mapped elsewhere)
+nnoremap <leader>Q Q
 " }}}
 
 " COMMON EDITS, WITH SPEED! {{{
@@ -193,21 +286,36 @@ inoremap <c-u> <esc>bgUwA
 " Make strings easily
 inoremap qv ""<esc>i
 " Paste the current line to the one below it
-nnoremap - :m+1<cr>
+nnoremap g- :m+1<cr>
+" activate the q macro with Q (also prevents accidentally entering ex mode)
+nnoremap Q @q
+" Line shit up doe
+nnoremap <Leader>a :Align 
 " }}}
 
 " USEFUL TOGGLES! {{{
 " Open/close folds with spacebar
 nnoremap <space> za
 " switch tabstop style
-nnoremap <leader>t :set expandtab tabstop=4 shiftwidth=4 softtabstop=4<cr>
-nnoremap <leader>T :set expandtab tabstop=8 shiftwidth=8 softtabstop=4<cr>
-nnoremap <leader>m :set expandtab tabstop=2 shiftwidth=2 softtabstop=2<cr>
-nnoremap <leader>M :set noexpandtab tabstop=4 softtabstop=4 shiftwidth=4<cr>
+nnoremap <leader>tt :set expandtab tabstop=4 shiftwidth=4 softtabstop=4<cr>
+nnoremap <leader>tT :set expandtab tabstop=8 shiftwidth=8 softtabstop=4<cr>
+nnoremap <leader>tm :set expandtab tabstop=2 shiftwidth=2 softtabstop=2<cr>
+nnoremap <leader>tM :set noexpandtab tabstop=4 softtabstop=4 shiftwidth=4<cr>
 " turn of listchars
 nnoremap <leader>l :set list!<cr>
 " toggle wrapping (and display current wrapping status)
 nnoremap <leader>W :setlocal wrap!<cr>:setlocal wrap?<cr>
+" Force redraw
+nnoremap <silent> <leader>rr :redraw!<cr>
+" Toggle mouse mode
+nnoremap <leader>ma :set mouse=a<cr>
+nnoremap <leader>mo :set mouse=<cr>
+" switching colors iz cool
+nnoremap <leader>cb :SCROLL<cr>
+nnoremap <leader>cn :NEXTCOLOR<cr>
+nnoremap <leader>cp :PREVCOLOR<cr>
+nnoremap <leader>cl :exe "colorscheme " . getline('.')<cr>
+nnoremap <leader>cf :sp ~/.vim/fav-colors<cr>
 " }}}
 
 " INTERACT WITH THE WORLD! {{{
@@ -223,7 +331,22 @@ nnoremap <leader>v mP:e $MYVIMRC<CR>
 nnoremap <leader>V :so $MYVIMRC<CR>`P
 " Save as sudo from nonsudo buffer
 nnoremap <leader>w :w !sudo tee %<cr>
+" Send stuff off to tmux (via slime)
+vnoremap <silent> <Leader>rs <Plug>SendSelectionToTmux
+nnoremap <silent> <Leader>rs <Plug>NormalModeSendToTmux
+nnoremap <silent> <Leader>rv <Plug>SetTmuxVars
 " }}} (interact...)
+
+" BOLDLY COMMIT TO GIT! {{{
+" Reggo commands
+nmap <leader>gs :Gstatus<CR>
+nmap <leader>gd :Gdiff<CR>
+nmap <leader>gb :Gblame<CR>
+" Check the functions sections for x-planations of these
+nnoremap <silent> <leader>g? :call CommittedFiles()<CR>:copen<CR>
+command! -nargs=1 GGrep call NonintrusiveGitGrep(<q-args>)
+nmap <leader>gg :copen<CR>:GGrep 
+" }}}
 
 " }}} (KEYMAPS)
 
@@ -237,6 +360,7 @@ augroup ft "{{{
     au BufNewFile,BufReadPost *.json set filetype=javascript
     au Bufnewfile,Bufreadpost *.m set filetype=objc
     au Bufnewfile,Bufreadpost *.md set filetype=markdown
+    au Bufnewfile,Bufreadpost *.nix set filetype=nix
 augroup END "}}}
 
 " Really, these are default settings, but they're guarded by the BufWinEnter
@@ -271,12 +395,26 @@ augroup html "{{{
     au FileType html inoremap abpa <p><CR></p><esc>ko
 augroup END "}}}
 
+augroup whitespace "{{{
+  au!
+  au BufWrite *.hs,*.py :call DeleteTrailingWS()
+augroup END "}}}
+
 augroup twospace "{{{
     au!
     au FileType html,javascript,ruby,coffee,jade set softtabstop=2
     au FileType html,javascript,ruby,coffee,jade set tabstop=2
     au FileType html,javascript,ruby,coffee,jade set shiftwidth=2
 augroup END "}}}
+
+augroup last_edit "{{{
+    " Return to last edit position when opening files
+    autocmd!
+    autocmd BufReadPost *
+         \ if line("'\"") > 0 && line("'\"") <= line("$") |
+         \   exe "normal! g`\"" |
+         \ endif
+augroup END " }}}
 
 augroup commentstyle "{{{
     au!
@@ -287,6 +425,11 @@ augroup commentstyle "{{{
     au FileTYpe vim                                 let b:comment_prefix="\" "
 augroup END "}}}
 
+augroup vimrc "{{{
+  au!
+  au BufWritePost .vimrc source $MYVIMRC
+augroup END "}}}
+
 augroup misc "{{{
     au!
     " call setInterpreter once FileType is known
@@ -295,7 +438,10 @@ augroup misc "{{{
     au FileType coffee,ruby,lua set foldmethod=indent
     " deactivate colorcolumn for man page
     au FileType man set cc=0
+    " some poorly written color schemes fuck up the termcolors setting
+    au ColorScheme * set t_Co=256
 augroup END "}}}
+
 " }}}
 
 
@@ -309,3 +455,4 @@ if filereadable(glob("~/.vimrc-local"))
     source ~/.vimrc-local
 endif
 " }}}
+

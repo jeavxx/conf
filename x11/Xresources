@@ -1,0 +1,23 @@
+#include $HOME/.urxvt-colors
+URxvt*font:                     xft:Source Code Pro for Powerline:size=9
+URxvt*boldFont:                 xft:Source Code Pro for Powerline:size=9
+URxvt*scrollBar:                false
+URxvt*loginshell:               true
+URxvt*background.border:        false
+URxvt*borderLess:               false
+URxvt*externalBorder:           0
+URxvt*internalBorder:           2
+URxvt*letterSpace:              -1.5
+URxvt*depth:                    32
+
+URxvt*secondaryScreen:          1
+URxvt*secondaryScroll:          0
+URxvt*secondaryWheel:           1
+
+! dmenu
+dmenu.font:                     Source Code Pro for Powerline-9:weight=light
+dmenu.background:               #ffffff
+dmenu.foreground:               #323232
+dmenu.selbackground:            #eeeeee
+dmenu.selforeground:            #0087d7
+

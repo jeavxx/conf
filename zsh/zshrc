@@ -3,7 +3,7 @@
 
 ZSH=$HOME/.oh-my-zsh
 DISABLE_AUTO_UPDATE="true"
-plugins=(git mercurial)
+plugins=(git mercurial cabal)
 
 if [[ "$TERM" == "linux" ]]; then
     # we're in the console
@@ -15,6 +15,10 @@ fi
 source $ZSH/oh-my-zsh.sh
 export EDITOR=vim
 export PATH=/usr/bin:/usr/local/bin:~/bin
+export PAGER="vimpager -c 'set nolist'"
+
+# Paths for package managers... ugh
+export PATH="$PATH:$HOME/.cabal/bin:$HOME/.nix-profile/bin"
 
 for config_file ($HOME/.zshrc-*);
 do

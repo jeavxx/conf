@@ -56,7 +56,7 @@ vman() {
 }
 
 pman() {
-    local man_pdf_dir="$HOME/documents/ref/man_pdf"
+    local man_pdf_dir="$HOME/documents/ref/man"
     local convert_cmd="ps2pdf - $man_pdf_dir/$1.pdf"
     local open_cmd="open $man_pdf_dir/$1.pdf"
 
@@ -73,4 +73,13 @@ pman() {
     fi
 
     eval "man -t $1 | $convert_cmd && $open_cmd 2>/dev/null"
+}
+
+switch() {
+    if [[ ! -f "$1" || ! -f "$2" ]]; then
+        1>&2 echo "error: bad filename(s)"
+    fi
+    cp "$1" "${1}.sbak"
+    cp "$2" "${2}.sbak"
+    mv "$1" /tmp && mv "$2" "$1" &&  mv "/tmp/$(basename "$1")" "$2"
 }

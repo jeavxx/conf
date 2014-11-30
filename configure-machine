@@ -12,7 +12,7 @@ install_oh_my_zsh() {
 install_vim_dir() {
     echo "configure-machine: creating .vim directory"
     mkdir "$install_to/.vim"
-    tar -xzf vim/vimdir.tar.gz -C $install_to/.vim --strip-components=1
+    tar -C $install_to/.vim -xJf vim/vimdir.tar.xz
 }
 
 create_dirs() {
@@ -37,6 +37,7 @@ parse_args() {
 }
 
 link_files() {
+    echo "linking files:"
     sqlite3 "$confdb" "select file, destination from file_locations" |\
         while read line;
         do
@@ -44,13 +45,14 @@ link_files() {
             destination="$install_to/$(echo $line | cut -d'|' -f2)"
             if [[ -f "$file" && ! "$file" -ef "$destination" ]];
             then
-                echo "configure-machine: linking $file to $destination"
+                echo "  $file -> $destination"
                 ln -f "$file" "$destination"
             elif [[ -n "$file" ]];
             then
-                echo "configure-machine: $file already linked to $destination"
+                echo "  $file already linked"
             fi
         done
+    echo "done"
 }
 
 parse_args
