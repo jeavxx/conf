@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# allows restarting dwm without losing other x windows
+# to actually kill the session, issue the command `killall xinit`
+
+while true; do
+    dwm 2> ~/.config/dwm/error.log
+done

@@ -1,0 +1,22 @@
+#!/bin/bash
+
+[[ $# < 2 ]] && 1>&2 echo "usage: prefix_resources [prefix] [file ...]" && exit 1
+
+find_file_suffix() { echo "$1" | sed -r 's@^.*/\.?[^.]+(\.[^/]+)+$@\1@'; }
+remove_file_suffix() { echo "$1" | sed -r 's@^(.*/\.?[^.]+)(\.[^/]+)+$@\1@'; }
+suffix_filename() {
+    local fname="$1"
+    local suf="$2"
+    [[ "$fname" =~ ^(/|\./) ]] || fname="./$fname"
+    echo "$(remove_file_suffix "$fname")_$suf$(find_file_suffix "$fname")"
+}
+
+
+prefix="$1"
+shift
+
+while [[ -f "$1" ]]; do
+    out_f="$(suffix_filename "$1" "$prefix")"
+    sed -r "s@^\*@$prefix*@" "$1" > "$out_f"
+    shift
+done

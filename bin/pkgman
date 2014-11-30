@@ -1,0 +1,41 @@
+#!/bin/bash
+
+use_groups=false
+while getopts 'g' opt
+do
+    case $opt in
+        g) use_groups=true ;;
+        *) 1>&2 echo "usage: pkgman [-g group | package]" && exit 1
+    esac
+done
+shift $(($OPTIND - 1))
+
+
+group_list_packages() {
+    local groupname="$1"
+    pacman -Qlg "$groupname" | awk '{print $2}'
+}
+
+
+package_list_manpages() {
+    local pkgname="$1"
+    pacman -Ql "$pkgname" |\
+        sed -nr "s@^$pkgname /usr/share/man/.*/([^/]*)\.([0-9])\.gz\$@\1@p" |\
+        sort |\
+        while read manpage; do
+            man -f $manpage
+        done | uniq
+}
+
+
+if [[ "$use_groups" == "true" ]]; then
+    spacer=""
+    group_list_packages "$1" | while read pkg; do
+        echo -e "${spacer}man pages for \E[1;32m$pkg:" && tput sgr0
+        spacer="\n"
+        package_list_manpages "$pkg" | sed -e 's/.*/  &/'
+    done
+else
+    package_list_manpages "$1"
+fi
+

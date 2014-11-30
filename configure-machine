@@ -12,7 +12,7 @@ install_oh_my_zsh() {
 install_vim_dir() {
     echo "configure-machine: creating .vim directory"
     mkdir "$install_to/.vim"
-    tar -xzf vim/vimdir.tar.gz -C $install_to/.vim --strip-components=1
+    tar -C $install_to/.vim -xJf vim/vimdir.tar.xz 
 }
 
 create_dirs() {

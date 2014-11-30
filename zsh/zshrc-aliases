@@ -1,3 +1,5 @@
+#!/bin/zsh
+#
 if [[ "$(uname -s)" == "Darwin" ]];
 then
     alias bd="brew doctor"
@@ -18,14 +20,24 @@ alias tmux="tmux -2"
 
 alias v="vim"
 alias vrc="vim ~/.vimrc"
-alias emacs="vim"
 alias zrc="vim ~/.zshrc"
+alias emacs="vim"
+
+if which vimcat &>> /dev/null;
+then
+    alias less="$PAGER"
+    alias zless="$PAGER"
+    alias vimcat="vimcat -c 'hi Normal ctermbg=none'"
+    alias vc="vimcat"
+    alias vcat="vimcat"
+fi
 
 # Linux specific
 alias hc="herbstclient"
 alias startx="ssh-agent startx"
 alias turf="tabbed -c surf -e"
 alias trux="tabbed -c urxvtc -embed"
+alias thura="tabbed zathura -e"
 
 # spelling probz
 alias -g lsit="list"
