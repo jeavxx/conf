@@ -16,7 +16,6 @@ set formatprg="PARINIT='rTbgqR B=.,?_A_a Q=_s>|' par\ -w72" " Prettier line form
 set nu                                  " show line numbers
 set cursorline                          " highight line of current cursor
 set colorcolumn=80                      " highlight column/s
-set list                                " display whitespace characters
 set listchars=tab:>\ ,eol:¬             " symbols with which to display whitespace
 set scrolloff=3                         " always display three lines above/below cursor
 set ruler                               " display line,col of cursor on statusbar

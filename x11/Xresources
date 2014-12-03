@@ -1,4 +1,4 @@
-#include $HOME/.urxvt-colors
+#include ".urxvt-colors"
 URxvt*font:                     xft:Source Code Pro for Powerline:size=9
 URxvt*boldFont:                 xft:Source Code Pro for Powerline:size=9
 URxvt*scrollBar:                false
@@ -15,7 +15,7 @@ URxvt*secondaryScroll:          0
 URxvt*secondaryWheel:           1
 
 ! dmenu
-dmenu.font:                     Source Code Pro for Powerline-9:weight=light
+dmenu.font:                     Source Code Pro for Powerline-9
 dmenu.background:               #ffffff
 dmenu.foreground:               #323232
 dmenu.selbackground:            #eeeeee

@@ -18,10 +18,12 @@ alias 40love="python -m SimpleHTTPServer &"
 alias swag='eval sudo $(fc -l -1 | sed -E "s/[0-9]+[ ]*(.)/\1/")'
 alias tmux="tmux -2"
 
-alias v="vim"
 alias vrc="vim ~/.vimrc"
 alias zrc="vim ~/.zshrc"
 alias emacs="vim"
+
+alias igrep="grep -i"
+alias egrep="grep -E"
 
 if which vimcat &>> /dev/null;
 then
@@ -33,12 +35,10 @@ then
 fi
 
 # Linux specific
-alias hc="herbstclient"
 alias startx="ssh-agent startx"
 alias turf="tabbed -c surf -e"
-alias trux="tabbed -c urxvtc -embed"
 alias thura="tabbed zathura -e"
 
 # spelling probz
-alias -g lsit="list"
+alias lsit="list"
 alias bim="vim"
